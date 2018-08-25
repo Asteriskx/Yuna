@@ -1,2 +1,2 @@
 # Yuna
-Yuna is trial listen on iTunes.
+Yuna is "iTunes" search wrapper API. (Music only...)
