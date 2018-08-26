@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Yuna.Exceptions;
@@ -282,35 +283,25 @@ namespace Yuna
 
 				foreach (var song in data.Songs.Select((v, i) => new { v, i }))
 				{
-					this._ItemList.Add(song.v);
-
 					if (this._AimpProperties.IsRunning)
 					{
-						var isContainTitle = song.v.TrackName.Contains(this._AimpProperties.CurrentTrack.Title);
-						var isContainArtist = song.v.ArtistName.Contains(this._AimpProperties.CurrentTrack.Artist);
-						if (isContainTitle || isContainArtist)
+						var isContainTitle = Regex.IsMatch(song.v.TrackName, this._AimpProperties.CurrentTrack.Title, RegexOptions.Singleline);
+						var isContainArtist = Regex.IsMatch(song.v.ArtistName, this._AimpProperties.CurrentTrack.Artist, RegexOptions.Singleline);
+						if (isContainArtist || isContainTitle)
 						{
+							this._ItemList.Add(song.v);
 							var mainItem = this.ResultView.Items.Add(song.v.TrackName);
 							mainItem.SubItems.Add(song.v.ArtistName);
 							mainItem.SubItems.Add(song.v.CollectionName);
-						}
-
-						if (song.i == 0)
-						{
-							this.Artwork.ImageLocation = song.v.ArtworkUrl100;
 						}
 						hitNum++;
 					}
 					else
 					{
+						this._ItemList.Add(song.v);
 						var mainItem = this.ResultView.Items.Add(song.v.TrackName);
 						mainItem.SubItems.Add(song.v.ArtistName);
 						mainItem.SubItems.Add(song.v.CollectionName);
-
-						if (song.i == 0)
-						{
-							this.Artwork.ImageLocation = song.v.ArtworkUrl100;
-						}
 						hitNum++;
 					}
 				}
