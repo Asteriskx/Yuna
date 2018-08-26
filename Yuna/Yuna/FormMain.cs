@@ -222,7 +222,42 @@ namespace Yuna
 
 		#endregion Event Method
 
-		#region Public Method
+		#region Private Method
+
+		/// <summary>
+		/// 楽曲一覧リストビューの初期設定を行います。
+		/// </summary>
+		private void _InitializeResultView()
+		{
+			try
+			{
+				this.ResultView.FullRowSelect = true;
+				this.ResultView.GridLines = true;
+				this.ResultView.Sorting = SortOrder.Ascending;
+				this.ResultView.View = View.Details;
+
+				var columnSong = new ColumnHeader();
+				var columnArtist = new ColumnHeader();
+				var columnAlbum = new ColumnHeader();
+
+				columnSong.Text = "曲名";
+				columnArtist.Text = "アーティスト";
+				columnAlbum.Text = "アルバム";
+
+				columnSong.Width = 200;
+				columnArtist.Width = 200;
+				columnAlbum.Width = 220;
+
+				this.ResultView.Columns.AddRange(new[] { columnSong, columnArtist, columnAlbum });
+			}
+			catch (Exception ex)
+			{
+				throw new YunaException(ex.Message);
+			}
+			finally
+			{
+			}
+		}
 
 		/// <summary>
 		/// iTunes Search API へ接続し、対象楽曲のデータを取得します。
@@ -253,25 +288,30 @@ namespace Yuna
 					{
 						var isContainTitle = song.v.TrackName.Contains(this._AimpProperties.CurrentTrack.Title);
 						var isContainArtist = song.v.ArtistName.Contains(this._AimpProperties.CurrentTrack.Artist);
-						if (isContainTitle && isContainArtist)
+						if (isContainTitle || isContainArtist)
 						{
 							var mainItem = this.ResultView.Items.Add(song.v.TrackName);
 							mainItem.SubItems.Add(song.v.ArtistName);
 							mainItem.SubItems.Add(song.v.CollectionName);
-							hitNum++;
 						}
+
+						if (song.i == 0)
+						{
+							this.Artwork.ImageLocation = song.v.ArtworkUrl100;
+						}
+						hitNum++;
 					}
 					else
 					{
 						var mainItem = this.ResultView.Items.Add(song.v.TrackName);
 						mainItem.SubItems.Add(song.v.ArtistName);
 						mainItem.SubItems.Add(song.v.CollectionName);
-						hitNum++;
-					}
 
-					if (song.i == 0)
-					{
-						this.Artwork.ImageLocation = song.v.ArtworkUrl100;
+						if (song.i == 0)
+						{
+							this.Artwork.ImageLocation = song.v.ArtworkUrl100;
+						}
+						hitNum++;
 					}
 				}
 
@@ -281,45 +321,6 @@ namespace Yuna
 			catch (Exception ex)
 			{
 				this.SearchResult.Text = "検索エラーが発生した為、検索できませんでした。";
-				throw new YunaException(ex.Message);
-			}
-			finally
-			{
-			}
-		}
-
-		#endregion Public Method
-
-		#region Private Method
-
-		/// <summary>
-		/// 楽曲一覧リストビューの初期設定を行います。
-		/// </summary>
-		private void _InitializeResultView()
-		{
-			try
-			{
-				this.ResultView.FullRowSelect = true;
-				this.ResultView.GridLines = true;
-				this.ResultView.Sorting = SortOrder.None;
-				this.ResultView.View = View.Details;
-
-				var columnSong = new ColumnHeader();
-				var columnArtist = new ColumnHeader();
-				var columnAlbum = new ColumnHeader();
-
-				columnSong.Text = "曲名";
-				columnArtist.Text = "アーティスト";
-				columnAlbum.Text = "アルバム";
-
-				columnSong.Width = 200;
-				columnArtist.Width = 200;
-				columnAlbum.Width = 220;
-
-				this.ResultView.Columns.AddRange(new[] { columnSong, columnArtist, columnAlbum });
-			}
-			catch (Exception ex)
-			{
 				throw new YunaException(ex.Message);
 			}
 			finally
